@@ -100,7 +100,7 @@ multimodal-ragops-platform/
 ## Related Projects
 
 - **[graph-rag-finance-assistant](../graph-rag-finance-assistant)** — Production GraphRAG system for SEC financial filings; provides the RAG pipeline this platform evaluates and optimizes
-- **[agentic-research-system](../agentic-research-system)** _(coming soon)_ — Autonomous multi-agent research system with three-tier memory, LLM-as-Judge quality gate, and LangGraph orchestration
+- **[multiagent-research-system](../multiagent-research-system)** _(coming soon)_ — Autonomous multi-agent research system with three-tier memory, LLM-as-Judge quality gate, and LangGraph orchestration
 
 ---
 
