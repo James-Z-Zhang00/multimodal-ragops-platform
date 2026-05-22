@@ -19,7 +19,7 @@ compare.py         → terminal output or results/comparison_TIMESTAMP.json
 
 ```bash
 pip install -r requirements.txt
-cp .env.example .env  # fill in values
+cp .env.example .env  # fill in SEC_PARSER_URL, NEO4J_* and OPENAI_API_KEY
 ```
 
 ### 1. Capture Input (chunks going into step 4)
@@ -32,9 +32,10 @@ Calls sec-parser, saves all chunks to `results/input_chunks.json`.
 
 ### 2. Build the graph
 
-Run a full build on the same file via the build-service:
+Upload the same file and trigger a full build via the build-service:
 
 ```bash
+curl -X POST http://localhost:8004/files/upload -F "files=@fixtures/sample.html"
 curl -X POST http://localhost:8004/build/full
 ```
 
@@ -44,9 +45,9 @@ curl -X POST http://localhost:8004/build/full
 python capture_output.py --file-name sample.html
 ```
 
-Queries Neo4j, saves entities and relationships per chunk to `results/output_entities.json`.
+Queries Neo4j for all chunks from that file — chunk text, entities, and relationships — and saves to `results/output_entities.json`.
 
-### 4. Compare
+### 3. Compare
 
 **Manual** — read and judge yourself:
 ```bash

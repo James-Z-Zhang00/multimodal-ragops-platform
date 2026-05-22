@@ -55,7 +55,7 @@ def query_chunks(driver, file_name: str) -> list:
             """
             MATCH (c:__Chunk__)-[:MENTIONS]->(s:__Entity__)-[r]->(t:__Entity__)<-[:MENTIONS]-(c)
             WHERE c.fileName = $file_name
-              AND type(r) NOT IN ['SIMILAR', 'IN_COMMUNITY']
+              AND NOT type(r) IN ['SIMILAR', 'IN_COMMUNITY']
             RETURN DISTINCT
                 c.id AS chunk_id,
                 s.id AS source,

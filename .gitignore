@@ -1,2 +1,12 @@
 ragops-eval/.env
 CLAUDE.md
+
+# Python virtual environments
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Benchmark artifacts
+ragops-eval/graph-building-quality/results/
+ragops-eval/graph-building-quality/fixtures/

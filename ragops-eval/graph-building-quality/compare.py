@@ -1,6 +1,10 @@
 """
 Compare step 4 input vs output.
 
+Loads input_chunks.json (from capture_input.py) and output_entities.json
+(from capture_output.py), matches them by chunk text, and shows what the
+LLM extracted from each chunk.
+
 Modes:
   --mode manual   Print formatted side-by-side for human review (default)
   --mode judge    Score each chunk with an LLM judge
@@ -42,9 +46,9 @@ Return ONLY a JSON object in this exact format:
 }"""
 
 
-def load_json(path: Path) -> list:
+def load_json(path: Path, label: str) -> list:
     if not path.exists():
-        print(f"File not found: {path}\nRun capture_input.py and capture_output.py first.")
+        print(f"File not found: {path}\nRun {label} first.")
         sys.exit(1)
     with open(path) as f:
         return json.load(f)
@@ -77,6 +81,10 @@ def print_manual(pairs: list):
         for line in (inp.get("text") or "").split("\n"):
             print(f"  {line}")
 
+        if not out:
+            print("\n  (no matching output found)")
+            continue
+
         entities = out.get("entities", [])
         print(f"\nEXTRACTED ENTITIES ({len(entities)}):")
         if entities:
@@ -96,10 +104,11 @@ def print_manual(pairs: list):
         else:
             print("  (none)")
 
-    total_e = sum(len(p["output"].get("entities", [])) for p in pairs)
-    total_r = sum(len(p["output"].get("relationships", [])) for p in pairs)
+    matched = sum(1 for p in pairs if p["output"])
+    total_e = sum(len(p["output"].get("entities", [])) for p in pairs if p["output"])
+    total_r = sum(len(p["output"].get("relationships", [])) for p in pairs if p["output"])
     print(f"\n{'─' * 70}")
-    print(f"TOTAL  {len(pairs)} chunks  |  {total_e} entities  |  {total_r} relationships")
+    print(f"TOTAL  {len(pairs)} input chunks  |  {matched} matched  |  {total_e} entities  |  {total_r} relationships")
 
 
 # ── Judge mode ────────────────────────────────────────────────────────────────
@@ -174,8 +183,8 @@ def main():
     parser.add_argument("--mode", choices=["manual", "judge"], default="manual")
     args = parser.parse_args()
 
-    inputs = load_json(RESULTS_DIR / "input_chunks.json")
-    outputs = load_json(RESULTS_DIR / "output_entities.json")
+    inputs = load_json(RESULTS_DIR / "input_chunks.json", "capture_input.py")
+    outputs = load_json(RESULTS_DIR / "output_entities.json", "capture_output.py")
     pairs = match_pairs(inputs, outputs)
 
     print(f"Loaded {len(inputs)} input chunks, {len(outputs)} output chunks → {len(pairs)} pairs\n")

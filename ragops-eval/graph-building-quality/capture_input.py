@@ -20,6 +20,18 @@ SEC_PARSER_URL = os.getenv("SEC_PARSER_URL", "http://localhost:8001")
 RESULTS_DIR = Path(os.getenv("RESULTS_DIR", "results"))
 
 
+def _auth_headers() -> dict:
+    """Return Google OIDC identity token header if gcloud is available."""
+    import subprocess
+    try:
+        token = subprocess.check_output(
+            ["gcloud", "auth", "print-identity-token"], stderr=subprocess.DEVNULL
+        ).decode().strip()
+        return {"Authorization": f"Bearer {token}"}
+    except Exception:
+        return {}
+
+
 def parse_file(file_path: str) -> list:
     url = f"{SEC_PARSER_URL.rstrip('/')}/api/sec/parse"
     file_name = Path(file_path).name
@@ -27,6 +39,7 @@ def parse_file(file_path: str) -> list:
         resp = requests.post(
             url,
             files={"files": (file_name, f, "application/octet-stream")},
+            headers=_auth_headers(),
             timeout=120,
         )
     resp.raise_for_status()
